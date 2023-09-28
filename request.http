@@ -1,0 +1,25 @@
+POST http://localhost:4001/products 
+content-type: application/json
+
+{
+  "name": "Pera",
+  "price": 5.99
+}
+
+###
+GET http://localhost:4001/products
+
+###
+GET http://localhost:4001/products/e651ee81-a711-4d95-aa68-0482b7557b28
+
+###
+PUT http://localhost:4001/products/e651ee81-a711-4d95-aa68-0482b7557b28
+content-type: application/json
+
+{
+  "name": "Banana Nanica",
+  "price": 78.30
+}
+
+###
+DELETE http://localhost:4001/products/4e84b48e-29f3-40de-8f90-271f3e566e85
