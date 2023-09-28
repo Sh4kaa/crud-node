@@ -1,5 +1,7 @@
 import express, { Response, Request } from "express";
 import { randomUUID } from "crypto";
+import fs from 'fs';
+
 
 
 const app = express();
@@ -11,7 +13,17 @@ interface Products {
   id: string;
 }
 
-const products: Products[] = [];
+
+let products: Products[] = [];
+
+fs.readFile('./src/db.json', (err, data) => {
+  if(err) {
+    console.log(err)
+  } else {
+    products = JSON.parse(data.toString())
+    
+  }
+})
 
 /* GET Home*/
 app.get("/", (request: Request, response: Response) => {
@@ -22,12 +34,14 @@ app.get("/", (request: Request, response: Response) => {
 app.post("/products", (request: Request, response: Response) => {
   const { name, price } = request.body;
 
-  const product = {
+  const product: Products = {
     name,
     price,
     id: randomUUID(),
   };
   products.push(product);
+  productFile()
+  
   return response.status(200).json(product);
 });
 
@@ -63,9 +77,11 @@ app.put("/products/:id", (request: Request, response: Response) => {
     price,
   };
 
-  if (productIndex === null || undefined) {
+  if (!productIndex) {
     return response.status(404).json({ message: "Não encontrado" });
   }
+  productFile()
+
   return response.status(200).json(products[productIndex]);
 });
 
@@ -74,8 +90,20 @@ app.delete('/products/:id', (request: Request, response: Response) => {
   const productIndex = products.findIndex(product => product.id === id);
 
   const itemDeleted = products.splice(productIndex, 1)
+  productFile()
 
   return response.json({message: `${itemDeleted[0].name} removido com sucesso`})
 })
 
 app.listen(4001, () => console.log("Server is running, PORT:4001"));
+
+
+function productFile() {
+  fs.writeFile('./src/db.json', JSON.stringify(products), (err) => {
+    if(err) {
+      console.log('deu erro')
+    } else {
+      console.log('Arquivo inserido com sucesso')
+    }
+  })
+}
